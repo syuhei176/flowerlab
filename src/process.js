@@ -8,6 +8,7 @@ export default class Process {
     this.width = 100
     this.height = 100
     this.outputPorts = []
+    this.inputPorts = []
     this.rubberband = rubberBand;
     this.rect = draw.rect(this.width, this.height)
     .attr({ fill: '#f0f0f0' })
@@ -48,10 +49,14 @@ export default class Process {
   connect(destination) {
     var c = new Connection(this.draw, this, destination)
     this.outputPorts.push(c)
+    destination.inputPorts.push(c)
     this.update()
   }
   update() {
     this.outputPorts.forEach((c)=>{
+      c.update()
+    })
+    this.inputPorts.forEach((c)=>{
       c.update()
     })
     
