@@ -19,7 +19,7 @@
     "lib"
   ],
   "publishConfig": {
-    "access": "public"
+    "access": "restrict"
   },
   "scripts": {
     "build": "parcel build src/index.html --out-dir build",
