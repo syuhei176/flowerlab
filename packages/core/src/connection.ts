@@ -21,10 +21,6 @@ export class Connection {
     var sy = this.source.getY()
     var dx = this.target.getX()
     var dy = this.target.getY()
-    this.polyline.plot([
-      [sx + 100, sy - 100],
-      [dx, dy - 50],
-      [sx + 100, sy]
-    ])
+    this.polyline.plot([sx + 100, sy - 100, dx, dy - 50, sx + 100, sy])
   }
 }
