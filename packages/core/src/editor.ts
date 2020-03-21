@@ -1,20 +1,33 @@
 import SVG from 'svg.js'
 import Process from './process'
 import { RubberBand } from './rubberband'
+import { ToolPallet } from './tool'
+
+interface EditorOptions {
+  width: number
+  height: number
+}
 
 export class Editor {
   public document: SVG.Doc
   rubberband: RubberBand
-  constructor(dom: string) {
-    this.document = SVG(dom).size(800, 500)
+
+  constructor(
+    dom: string,
+    options: EditorOptions = { width: 800, height: 500 }
+  ) {
+    this.document = SVG(dom).size(options.width, options.height)
     this.rubberband = new RubberBand()
-    var toolGroup = this.document.group().move(100, 0)
-    var toolText = this.document.text('tool').move(0, 70)
-    var toolMenu = this.document.rect(50, 50).attr({ fill: '#2030f0' })
-    toolMenu.click(() => {
+    const baseRect = this.document
+      .rect(options.width, options.height)
+      .attr({ fill: '#fff' })
+    this.document.text('Click canvas to create new Process.').move(12, 12)
+    baseRect.click((e: MouseEvent) => {
       const newProcess = new Process(this.document, this.rubberband)
+      newProcess.move(e.x, e.y)
     })
-    toolGroup.add(toolText)
-    toolGroup.add(toolMenu)
+  }
+  static from(dom: string) {
+    return new Editor(dom)
   }
 }

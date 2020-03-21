@@ -9,6 +9,7 @@ export class RubberBand {
     this.source = null
   }
   setSource(source: Process) {
+    this.dragging = true
     this.source = source
   }
 

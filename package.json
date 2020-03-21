@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "watch": "lerna run watch --scope @flowerlab/editor",
+    "watch": "lerna run --parallel watch",
     "build": "lerna run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
