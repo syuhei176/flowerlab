@@ -37,6 +37,8 @@
     "@cryptoeconomicslab/primitives": "^0.0.6"
   },
   "dependencies": {
-    "svg.js": "^2.7.1"
+    "@types/uuid": "^7.0.2",
+    "svg.js": "^2.7.1",
+    "uuid": "^7.0.2"
   }
 }

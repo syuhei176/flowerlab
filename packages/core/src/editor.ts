@@ -10,6 +10,7 @@ interface EditorOptions {
 
 export class Editor {
   public document: SVG.Doc
+  public connectionGroup: SVG.G
   rubberband: RubberBand
 
   constructor(
@@ -21,9 +22,10 @@ export class Editor {
     const baseRect = this.document
       .rect(options.width, options.height)
       .attr({ fill: '#fff' })
+    this.connectionGroup = this.document.group()
     this.document.text('Click canvas to create new Process.').move(12, 12)
     baseRect.click((e: MouseEvent) => {
-      const newProcess = new Process(this.document, this.rubberband)
+      const newProcess = new Process(this, this.rubberband)
       newProcess.move(e.x, e.y)
     })
   }
