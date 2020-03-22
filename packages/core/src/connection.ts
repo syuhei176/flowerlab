@@ -1,5 +1,5 @@
 import SVG from 'svg.js'
-import Process from './process'
+import { Port } from './port'
 import { Editor } from './editor'
 import { v1 } from 'uuid'
 
@@ -10,33 +10,38 @@ interface ConnectionOptions {
 export class Connection {
   readonly id: string
   group: SVG.G
-  polyline: SVG.PolyLine
+  polyline: SVG.Line
   constructor(
     readonly editor: Editor,
-    readonly source: Process,
-    readonly target: Process,
+    readonly source: Port,
+    readonly target: Port,
     options: ConnectionOptions = { color: '#97f7b7' }
   ) {
     this.id = v1()
-    this.group = editor.connectionGroup.group().move(0, 100)
+    this.group = editor.connectionGroup.group().move(0, 0)
     this.polyline = editor.connectionGroup
-      .polyline('0,0 50,50 0,100 0,0')
-      .move(100, 0)
+      .line([0, 0, 100, 100])
+      .move(0, 0)
+      .stroke({
+        width: 1,
+        color: '#333'
+      })
       .fill(options.color)
     this.group.add(this.polyline)
     this.polyline.dblclick(() => {
       this.remove()
     })
+    this.update()
   }
   equals(connection: Connection) {
     return this.id === connection.id
   }
   update() {
-    var sx = this.source.x
-    var sy = this.source.y
-    var dx = this.target.x
-    var dy = this.target.y
-    this.polyline.plot([sx + 100, sy - 100, dx, dy - 50, sx + 100, sy])
+    const sx = this.source.x
+    const sy = this.source.y
+    const dx = this.target.x
+    const dy = this.target.y
+    this.polyline.plot([sx, sy, dx, dy])
   }
   remove() {
     this.group.remove()

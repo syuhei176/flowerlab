@@ -18,7 +18,6 @@ export class Editor {
     options: EditorOptions = { width: 800, height: 500 }
   ) {
     this.document = SVG(dom).size(options.width, options.height)
-    this.rubberband = new RubberBand()
     const baseRect = this.document
       .rect(options.width, options.height)
       .attr({ fill: '#fff' })
@@ -28,6 +27,7 @@ export class Editor {
       const newProcess = new Process(this, this.rubberband)
       newProcess.move(e.x, e.y)
     })
+    this.rubberband = new RubberBand(this)
   }
   static from(dom: string) {
     return new Editor(dom)

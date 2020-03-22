@@ -3,6 +3,7 @@ import SVG from 'svg.js'
 import { RubberBand } from './rubberband'
 import { v1 } from 'uuid'
 import { Editor } from './editor'
+import { Port } from './port'
 
 interface ProcessOptions {
   color: string
@@ -17,6 +18,8 @@ export default class Process {
   outputPorts: Connection[]
   rubberband: RubberBand
   dragging: boolean
+  input: Port
+  output: Port
 
   constructor(
     readonly editor: Editor,
@@ -34,13 +37,8 @@ export default class Process {
     this.rect = editor.document
       .rect(this.width, this.height)
       .attr({ fill: options.color })
-    const arrow = editor.document
-      .polyline('0,0 50,50 0,100 0,0')
-      .move(100, 0)
-      .fill('#a0ffc0')
 
     this.group.add(this.rect)
-    this.group.add(arrow)
     this.rect.mousedown(() => {
       this.dragging = true
       this.highlight()
@@ -48,23 +46,25 @@ export default class Process {
     editor.document.mouseup(() => {
       this.dragging = false
     })
-    this.rect.mouseup(() => {
-      this.dragging = false
-      if (
-        this.rubberband.dragging &&
-        this.rubberband.source &&
-        !this.equals(this.rubberband.source)
-      ) {
-        this.rubberband.connect(this)
-      }
-    })
     this.editor.document.mousemove(e => {
       if (this.dragging) {
         this.move(e.x, e.y)
       }
     })
-    arrow.mousedown(() => {
-      this.rubberband.setSource(this)
+    this.input = new Port(editor, this, true)
+    this.output = new Port(editor, this, false)
+    this.input.on('mouseup', () => {
+      this.dragging = false
+      if (
+        this.rubberband.dragging &&
+        this.rubberband.source
+        //        !this.equals(this.rubberband.source)
+      ) {
+        this.rubberband.connect(this.input)
+      }
+    })
+    this.output.on('mousedown', () => {
+      this.rubberband.setSource(this.output)
     })
   }
 
@@ -90,21 +90,8 @@ export default class Process {
       this.rect.fill({ color: '#f0f0f0' })
     }, 1000)
   }
-  connect(dest: Process) {
-    const c = new Connection(this.editor, this, dest)
-    this.outputPorts.push(c)
-    dest.inputPorts.push(c)
-    this.update()
-  }
-
-  removeConnection(connection: Connection) {
-    this.outputPorts = this.outputPorts.filter(p => p.equals(connection))
-    this.inputPorts = this.inputPorts.filter(p => p.equals(connection))
-    this.update()
-  }
-
   update() {
-    this.outputPorts.forEach(c => c.update())
-    this.inputPorts.forEach(c => c.update())
+    this.input.update()
+    this.output.update()
   }
 }
