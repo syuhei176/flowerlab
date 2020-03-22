@@ -1,6 +1,6 @@
 {
   "name": "@flowerlab/editor",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "editor",
   "author": {
     "name": "Shuhei Hiya",
@@ -27,7 +27,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@flowerlab/core": "^0.0.2",
+    "@flowerlab/core": "^0.0.3",
     "parcel-bundler": "^1.12.4"
   },
   "devDependencies": {
