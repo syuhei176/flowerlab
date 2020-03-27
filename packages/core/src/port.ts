@@ -14,7 +14,7 @@ export class Port extends EventEmitter {
   constructor(
     readonly editor: Editor,
     readonly parent: Process,
-    isInput: boolean
+    readonly isInput: boolean
   ) {
     super()
     this.id = v1()
@@ -52,7 +52,13 @@ export class Port extends EventEmitter {
   removeConnection(connection: Connection) {
     this.outputs = this.outputs.filter(o => !o.equals(connection))
   }
-  update() {
+  update(index: number, length: number) {
+    this.group.move(
+      (this.isInput ? 0 : this.parent.width) -
+        Math.floor(this.circle.width() / 2),
+      Math.floor((this.parent.height / (length + 1)) * (index + 1)) -
+        Math.floor(this.circle.height() / 2)
+    )
     this.outputs.forEach(o => o.update())
     this.inputs.forEach(i => i.update())
   }

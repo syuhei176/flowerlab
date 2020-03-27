@@ -11,7 +11,7 @@ interface EditorOptions {
 export class Editor {
   public document: SVG.Doc
   public connectionGroup: SVG.G
-  rubberband: RubberBand
+  public rubberband: RubberBand
 
   constructor(
     dom: string,

@@ -5,7 +5,7 @@ import { v1 } from 'uuid'
 import { Editor } from './editor'
 import { Port } from './port'
 
-interface ProcessOptions {
+export interface ProcessOptions {
   color: string
 }
 export default class Process {
@@ -14,12 +14,9 @@ export default class Process {
   rect: SVG.Element
   width: number
   height: number
-  inputPorts: Connection[]
-  outputPorts: Connection[]
-  rubberband: RubberBand
   dragging: boolean
-  input: Port
-  output: Port
+  inputPorts: Port[] = []
+  outputPorts: Port[] = []
 
   constructor(
     readonly editor: Editor,
@@ -30,13 +27,11 @@ export default class Process {
     this.group = editor.document.group().move(0, 100)
     this.width = 100
     this.height = 100
-    this.outputPorts = []
-    this.inputPorts = []
-    this.rubberband = rubberBand
     this.dragging = false
     this.rect = editor.document
       .rect(this.width, this.height)
       .attr({ fill: options.color })
+      .stroke('#333')
 
     this.group.add(this.rect)
     this.rect.mousedown(() => {
@@ -51,21 +46,50 @@ export default class Process {
         this.move(e.x, e.y)
       }
     })
-    this.input = new Port(editor, this, true)
-    this.output = new Port(editor, this, false)
-    this.input.on('mouseup', () => {
+    this.addInputPort()
+    this.addOutputPort()
+  }
+
+  setCustomeElement(element: SVG.G) {
+    this.group.add(element)
+  }
+
+  addInputPort() {
+    const input = new Port(this.editor, this, true)
+    input.on('mouseup', () => {
       this.dragging = false
+      const rubberband = this.editor.rubberband
       if (
-        this.rubberband.dragging &&
-        this.rubberband.source
+        rubberband.dragging &&
+        rubberband.source
         //        !this.equals(this.rubberband.source)
       ) {
-        this.rubberband.connect(this.input)
+        rubberband.connect(input)
+        if (
+          rubberband.source.parent.outputPorts.filter(
+            p => p.outputs.length === 0
+          ).length === 0
+        ) {
+          rubberband.source.parent.addOutputPort()
+        }
       }
     })
-    this.output.on('mousedown', () => {
-      this.rubberband.setSource(this.output)
+    this.inputPorts.push(input)
+  }
+
+  addOutputPort() {
+    const output = new Port(this.editor, this, false)
+    output.on('mousedown', () => {
+      this.editor.rubberband.setSource(output)
     })
+    this.outputPorts.push(output)
+    this.h = this.outputPorts.length * 40 + 60
+  }
+
+  set h(h: number) {
+    this.height = h
+    this.rect.attr({ height: this.height })
+    this.update()
   }
 
   get x() {
@@ -91,7 +115,11 @@ export default class Process {
     }, 1000)
   }
   update() {
-    this.input.update()
-    this.output.update()
+    this.inputPorts.forEach((i, index) =>
+      i.update(index, this.inputPorts.length)
+    )
+    this.outputPorts.forEach((o, index) =>
+      o.update(index, this.outputPorts.length)
+    )
   }
 }
